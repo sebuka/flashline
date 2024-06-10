@@ -3,4 +3,21 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="grid_color">#FFFFFFFF</color>
+    <color name="star_color">#FFC107</color>
+    <color name="color1">#BF0000</color>
+    <color name="color2">#00BF00</color>
+    <color name="color3">#0000BF</color>
+    <color name="color4">#BFBF00</color>
+    <color name="color5">#BF00BF</color>
+    <color name="color6">#00BFBF</color>
+    <color name="color7">#800000</color>
+    <color name="color8">#008000</color>
+    <color name="color9">#000080</color>
+    <color name="color10">#808000</color>
+    <color name="color11">#800080</color>
+    <color name="color12">#008080</color>
+    <color name="color13">#C0C0C0</color>
+    <color name="color14">#808080</color>
+    <color name="color15">#400000</color>
+    <color name="color16">#004000</color>
 </resources>

@@ -57,8 +57,7 @@
             android:layout_marginTop="8dp"
             android:textSize="18sp"
             android:textColor="#FFFFFF"
-
-            android:entries="@array/difficulty_options" />
+            />
 
         <Button
             android:id="@+id/start_button"

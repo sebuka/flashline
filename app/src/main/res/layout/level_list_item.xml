@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="16dp"
+    android:background="#434457"
+    android:layout_marginBottom="8dp">
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/level_seed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Уровень: 123456"
+            android:textSize="18sp"
+            android:textColor="#FFFFFF"
+            android:paddingBottom="4dp"/>
+
+        <TextView
+            android:id="@+id/level_difficulty"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Сложность: Medium"
+            android:textSize="16sp"
+            android:textColor="#FFFFFF"
+            android:paddingBottom="4dp"/>
+
+        <TextView
+            android:id="@+id/level_result"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Результат: 1000"
+            android:textSize="16sp"
+            android:textColor="#FFFFFF"
+            android:paddingBottom="8dp"/>
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btn_view_solution"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:layout_gravity="center_vertical"
+        android:text="Посмотреть решение"
+        android:textColor="#FFFFFF"
+        android:background="@drawable/button_background"
+        android:padding="8dp"/>
+</LinearLayout>

@@ -44,4 +44,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        try {
+            finish();
+        } catch (Exception e) {
+        }
+    }
 }
