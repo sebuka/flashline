@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
 
         Button playButton = findViewById(R.id.play_button);
         Button statsButton = findViewById(R.id.stats_button);
-
+        Button rulesButton = findViewById(R.id.rules_button);
         playButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -40,6 +40,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, StatsActivity.class);
+                startActivity(intent);
+            }
+        });
+        rulesButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, RulesActivity.class);
                 startActivity(intent);
             }
         });

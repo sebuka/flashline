@@ -1,5 +1,6 @@
 package com.example.myapplication.gameobjects;
 
+import android.annotation.SuppressLint;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.view.View;
@@ -12,6 +13,7 @@ public class Wall extends GameObject {
         updateTexture();
     }
 
+    @SuppressLint("UseCompatLoadingForDrawables")
     @Override
     public void updateTexture() {
         Drawable[] layers = new Drawable[2];

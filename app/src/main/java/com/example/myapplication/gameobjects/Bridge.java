@@ -1,5 +1,6 @@
 package com.example.myapplication.gameobjects;
 
+import android.annotation.SuppressLint;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.VectorDrawable;
@@ -17,8 +18,6 @@ public class Bridge extends GameObject implements Connectable {
     private List<Connectable> vertical;
     private List<Connectable> horizontal;
 
-    private int verticalColor = -1;
-    private int horizontalColor = -1;
 
     public Bridge(int x, int y, View view) {
         super(x, y, view);
@@ -28,6 +27,7 @@ public class Bridge extends GameObject implements Connectable {
     }
 
     @Override
+    @SuppressLint("UseCompatLoadingForDrawables")
     public void updateTexture() {
         Drawable[] layers = new Drawable[4];
         layers[0] = view.getContext().getDrawable(R.drawable.grid_item_background);
@@ -45,7 +45,6 @@ public class Bridge extends GameObject implements Connectable {
                 underway[1] = view.getContext().getDrawable(R.drawable.under_way_down);
                 layers[2] = new LayerDrawable(underway);
             }
-            layers[2].setTint(verticalColor);
 
         }
         if (!horizontal.isEmpty()) {
@@ -54,7 +53,6 @@ public class Bridge extends GameObject implements Connectable {
             } else {
                 layers[3] = view.getContext().getDrawable(R.drawable.completed_way);
             }
-            layers[3].setTint(horizontalColor);
         }
         LayerDrawable layerDrawable = new LayerDrawable(layers);
         view.setBackground(layerDrawable);
@@ -68,14 +66,14 @@ public class Bridge extends GameObject implements Connectable {
             if (horizontal.isEmpty()) {
                 return vertical.size() != 1;
             } else {
-                return (horizontalColor == to.getColor((4 - postype) % 4) || to.getColor((4 - postype) % 4) == -1) && vertical.size() != 1;
+                return  vertical.size() != 1;
             }
         } else {
             if (vertical.size() >= 2) return false;
             if (vertical.isEmpty()) {
                 return horizontal.size() != 1;
             } else {
-                return (verticalColor == to.getColor((4 - postype) % 4) || to.getColor((4 - postype) % 4) == -1) && horizontal.size() != 1;
+                return horizontal.size() != 1;
             }
         }
 
@@ -96,8 +94,6 @@ public class Bridge extends GameObject implements Connectable {
     public void clearConnections() {
         vertical.clear();
         horizontal.clear();
-        verticalColor = -1;
-        horizontalColor = -1;
         updateTexture();
     }
 
@@ -109,22 +105,6 @@ public class Bridge extends GameObject implements Connectable {
         return paths;
     }
 
-    public int getColor(int posType) {
-        if (posType == 0 || posType == 2) {
-            return horizontalColor;
-        } else {
-            return verticalColor;
-        }
-    }
 
-    @Override
-    public void setColor(int color, int posType) {
-        if (posType == 0 || posType == 2) {
-            Log.d("ColorS", "horizont");
-            horizontalColor = color;
-        } else {
-            Log.d("ColorS", "vertical");
-            verticalColor = color;
-        }
-    }
+
 }

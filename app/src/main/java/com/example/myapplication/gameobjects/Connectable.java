@@ -7,6 +7,4 @@ public interface Connectable {
     void clearConnections() ;
     int getPathsCount() ;
 
-    int getColor(int posType);
-    void setColor(int color, int posType);
 }

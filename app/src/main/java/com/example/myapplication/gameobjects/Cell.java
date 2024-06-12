@@ -1,5 +1,6 @@
 package com.example.myapplication.gameobjects;
 
+import android.annotation.SuppressLint;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.VectorDrawable;
@@ -16,17 +17,12 @@ public class Cell extends GameObject implements Connectable {
 
     protected List<Connectable> connections;
 
-    private int color = -1;
-
     public Cell(int x, int y, View view) {
         super(x, y, view);
         connections = new ArrayList<>();
         updateTexture();
     }
 
-    public int getColor(int posType) {
-        return color;
-    }
 
     @Override
     public boolean canConnect(Connectable to) {
@@ -35,7 +31,7 @@ public class Cell extends GameObject implements Connectable {
         }
         if (connections.contains(to))
             return false;
-        return this.color == to.getColor(0) || this.color == -1 || to.getColor(0) == -1;
+        return true;
     }
 
     @Override
@@ -45,21 +41,18 @@ public class Cell extends GameObject implements Connectable {
         updateTexture();
     }
 
-    public void setColor(int color, int posType) {
-        this.color = color;
-    }
 
     private int getMaxConnections() {
         return 2;
     }
 
     @Override
+    @SuppressLint("UseCompatLoadingForDrawables")
     public void updateTexture() {
         Drawable[] layers = new Drawable[2];
         layers[0] = view.getContext().getDrawable(R.drawable.grid_item_background);
         if (connections.size() == 1) {
             VectorDrawable vectorDrawable = (VectorDrawable) view.getContext().getDrawable(R.drawable.way);
-            vectorDrawable.setTint(color);
             int rotationAngle = 90 * getConnectedPositionType(connections.get(0));
             layers[1] = new RotatedVectorDrawable(vectorDrawable, rotationAngle);
         } else if (connections.size() >= 2) {
@@ -73,20 +66,18 @@ public class Cell extends GameObject implements Connectable {
             }
             if (Math.abs(postype1 - postype2) != 2) {
                 VectorDrawable vectorDrawable = (VectorDrawable) view.getContext().getDrawable(R.drawable.corner_way);
-                vectorDrawable.setTint(color);
                 int rotate = 0;
                 if (postype1 == 0 && postype2 == 1)
-                    rotate = 0; // сверху вниз
+                    rotate = 0;
                 if (postype1 == 1 && postype2 == 2)
-                    rotate = 1; // справа вниз
+                    rotate = 1;
                 if (postype1 == 2 && postype2 == 3)
-                    rotate = 2; // снизу вверх
+                    rotate = 2;
                 if (postype1 == 0 && postype2 == 3)
-                    rotate = 3; // слева вверх
+                    rotate = 3;
                 layers[1] = new RotatedVectorDrawable(vectorDrawable, 90 * rotate);
             } else {
                 VectorDrawable vectorDrawable = (VectorDrawable) view.getContext().getDrawable(R.drawable.completed_way);
-                vectorDrawable.setTint(color);
                 int rotate = 0;
                 if (postype1 == 1 && postype2 == 3)
                     rotate = 1; // справа вниз
@@ -99,7 +90,6 @@ public class Cell extends GameObject implements Connectable {
 
     public void clearConnections() {
         connections.clear();
-        color = -1;
         updateTexture();
     }
 

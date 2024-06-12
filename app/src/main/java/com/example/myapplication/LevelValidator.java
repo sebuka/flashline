@@ -2,225 +2,235 @@ package com.example.myapplication;
 
 import java.util.*;
 
-public class LevelValidator {
+class LevelValidator {
     private static final long INF = Long.MAX_VALUE / 2;
+    private int n, s, t;
     private int[][] grid;
-    private int gridSize;
+    private MCMF mcmf;
 
     public LevelValidator(int[][] grid) {
+        n = grid.length;
+        int sz = n * n;
+        s = 0;
+        t = 4 * sz + 1;
+        mcmf = new MCMF(4 * sz + 2, s, t);
         this.grid = grid;
-        this.gridSize = grid.length;
+
     }
 
-    public int validate() {
-        int numCells = gridSize * gridSize; // Общее количество ячеек в сетке
-        int source = 0; // Источник в графе потока
-        int sink = 4 * numCells + 1; // Сток в графе потока
-        MinCostMaxFlow mcmf = new MinCostMaxFlow(4 * numCells + 2, source, sink);
-        Map<Integer, Boolean> usedColors = new HashMap<>();
-        processGridInput(mcmf, usedColors); // Обработка входных данных
-        initializeFlowGraph(mcmf, usedColors); // Инициализация графа потока
-        createFlowGraphEdges(mcmf); // Создание ребер графа потока
-
-        int requiredFlow = usedColors.size(); // Необходимый поток
-        Pair<Long, Long> result = mcmf.computeMaxFlow(); // Вычисление максимального потока и минимальной стоимости
-        long flow = result.getFirst(), cost = result.getSecond(); // Извлечение результата
-
-        if (flow != requiredFlow) {
-            return -1; // Если поток не равен требуемому, возвращаем -1
-        }
-        return (int) cost; // Возвращаем стоимость
+    private boolean isValid(int x, int y) {
+        return x >= 0 && y >= 0 && x < n && y < n;
     }
 
-    // Метод для обработки входных данных
-    private void processGridInput(MinCostMaxFlow mcmf, Map<Integer, Boolean> usedColors) {
-        for (int y = 0; y < gridSize; y++) {
-            for (int x = 0; x < gridSize; x++) {
-                int type = grid[y][x];
+    public long validate() {
+        Map<Integer, Boolean> colors = new HashMap<>();
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                int type = grid[i][j];
                 if (type > 0) {
-                    if (!usedColors.containsKey(type)) {
-                        mcmf.addEdge(0, x * gridSize + y + 1, 1, 0); // Добавление ребра от источника
+                    if (!colors.containsKey(type)) {
+                        mcmf.addEdge(s, j * n + i + 1, 1, 0);
                     } else {
-                        mcmf.addEdge(x * gridSize + y + 1 + gridSize * gridSize, 4 * gridSize * gridSize + 1, 1, 0); // Добавление ребра к стоку
+                        mcmf.addEdge(j * n + i + 1 + n * n, t, 1, 0);
                     }
-                    usedColors.put(type, true); // Пометка использованного цвета
+                    colors.put(type, true);
                 }
             }
         }
-    }
 
-    // Метод для инициализации графа потока
-    private void initializeFlowGraph(MinCostMaxFlow mcmf, Map<Integer, Boolean> usedColors) {
-        int[][] horizontalEdges = new int[gridSize][gridSize], verticalEdges = new int[gridSize][gridSize];
-        for (int[] row : horizontalEdges) Arrays.fill(row, -1);
-        for (int[] row : verticalEdges) Arrays.fill(row, -1);
+        int[][] h = new int[n][n];
+        int[][] v = new int[n][n];
+        for (int i = 0; i < n; i++) {
+            Arrays.fill(h[i], -1);
+            Arrays.fill(v[i], -1);
+        }
 
-        for (int i = 0; i < gridSize; ++i) {
-            for (int j = 0; j < gridSize; ++j) {
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
                 if (grid[i][j] == -1) {
-                    horizontalEdges[i][j] = i * gridSize + j + 1; // Горизонтальные ребра
-                    mcmf.addEdge(horizontalEdges[i][j], horizontalEdges[i][j] + gridSize * gridSize, 1, 0);
-                    verticalEdges[i][j] = i * gridSize + j + 1 + 2 * gridSize * gridSize; // Вертикальные ребра
-                    mcmf.addEdge(verticalEdges[i][j], verticalEdges[i][j] + gridSize * gridSize, 1, 0);
+                    h[i][j] = i * n + j + 1;
+                    mcmf.addEdge(h[i][j], h[i][j] + n * n, 1, 0);
+                    v[i][j] = i * n + j + 1 + 2 * n * n;
+                    mcmf.addEdge(v[i][j], v[i][j] + n * n, 1, 0);
                 } else if (grid[i][j] != -2) {
-                    horizontalEdges[i][j] = verticalEdges[i][j] = i * gridSize + j + 1;
-                    mcmf.addEdge(horizontalEdges[i][j], horizontalEdges[i][j] + gridSize * gridSize, 1, 0);
+                    h[i][j] = v[i][j] = i * n + j + 1;
+                    mcmf.addEdge(h[i][j], h[i][j] + n * n, 1, 0);
                 }
             }
         }
-    }
 
-    // Метод для создания ребер графа потока
-    private void createFlowGraphEdges(MinCostMaxFlow mcmf) {
         int[] dx = {-1, 0, 0, 1};
         int[] dy = {0, -1, 1, 0};
-        boolean[] isHorizontal = {false, true, true, false};
+        boolean[] check = {false, true, true, false};
 
-        for (int i = 0; i < gridSize; ++i) {
-            for (int j = 0; j < gridSize; ++j) {
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
                 if (grid[i][j] == -2) continue;
-                for (int direction = 0; direction < 4; ++direction) {
-                    int x = i + dx[direction], y = j + dy[direction];
-                    if (isValidCoordinate(x, y) && grid[x][y] != -2) {
-                        if (isHorizontal[direction]) {
-                            mcmf.addEdge(i * gridSize + j + 1 + gridSize * gridSize, x * gridSize + y + 1, 1, 1);
+                for (int k = 0; k < 4; k++) {
+                    int x = i + dx[k], y = j + dy[k];
+                    if (isValid(x, y) && grid[x][y] != -2) {
+                        if (check[k]) {
+                            mcmf.addEdge(h[i][j] + n * n, h[x][y], 1, 1);
                         } else {
-                            mcmf.addEdge(i * gridSize + j + 1 + 2 * gridSize * gridSize, x * gridSize + y + 1, 1, 1);
+                            mcmf.addEdge(v[i][j] + n * n, v[x][y], 1, 1);
                         }
                     }
                 }
             }
         }
-    }
 
-    // Метод для проверки корректности координат
-    private boolean isValidCoordinate(int x, int y) {
-        return x >= 0 && y >= 0 && x < gridSize && y < gridSize;
-    }
-
-    // Вложенный класс Edge для представления ребра графа
-    static class Edge {
-        int destination;
-        long capacity, flow, cost;
-
-        Edge(int destination, long capacity, long flow, long cost) {
-            this.destination = destination;
-            this.capacity = capacity;
-            this.flow = flow;
-            this.cost = cost;
+        int need = colors.size();
+        Pair<Long, Long> result = mcmf.maxFlow();
+        if (result.getFirst() != need) {
+            return -1;
+        } else {
+            return result.getSecond() / 2;
         }
     }
 
-    // Вложенный класс MinCostMaxFlow для реализации алгоритма минимальной стоимости максимального потока
-    static class MinCostMaxFlow {
-        List<Edge> edges;
-        List<List<Integer>> graph;
-        long[] distance, potential;
-        int[] parent;
-        int numNodes, source, sink;
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        int n = scanner.nextInt();
+        int[][] grid = new int[n][n];
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                grid[i][j] = scanner.nextInt();
+            }
+        }
+        new LevelValidator(grid).validate();
+    }
 
-        MinCostMaxFlow(int numNodes, int source, int sink) {
-            this.numNodes = numNodes;
-            this.source = source;
-            this.sink = sink;
-            edges = new ArrayList<>();
-            graph = new ArrayList<>();
-            for (int i = 0; i < numNodes; i++) graph.add(new ArrayList<>());
-            distance = new long[numNodes];
-            potential = new long[numNodes];
-            parent = new int[numNodes];
+    static class MCMF {
+        class Edge {
+            int v;
+            long c, f, cost;
+
+            Edge(int v, long c, long f, long cost) {
+                this.v = v;
+                this.c = c;
+                this.f = f;
+                this.cost = cost;
+            }
         }
 
-        void addEdge(int from, int to, long capacity, long cost) {
-            graph.get(from).add(edges.size());
-            edges.add(new Edge(to, capacity, 0, cost));
-            graph.get(to).add(edges.size());
-            edges.add(new Edge(from, 0, 0, -cost));
+        private int n, s, t;
+        private List<Edge> edge;
+        private List<List<Integer>> g;
+        private long[] d, p;
+        private int[] par, ft;
+
+        MCMF(int n, int s, int t) {
+            this.n = n;
+            this.s = s;
+            this.t = t;
+            edge = new ArrayList<>();
+            g = new ArrayList<>(n);
+            for (int i = 0; i < n; i++) {
+                g.add(new ArrayList<>());
+            }
+            d = new long[n];
+            p = new long[n];
+            par = new int[n];
         }
 
-        boolean relaxEdges() {
-            Arrays.fill(distance, INF);
-            Arrays.fill(parent, -1);
-            PriorityQueue<Pair<Long, Integer>> queue = new PriorityQueue<>();
-            distance[source] = 0;
-            queue.add(new Pair<>(distance[source], source));
+        void addEdge(int u, int v, long c, long cost) {
+            g.get(u).add(edge.size());
+            edge.add(new Edge(v, c, 0, cost));
+            g.get(v).add(edge.size());
+            edge.add(new Edge(u, 0, 0, -cost));
+        }
+
+        private boolean flex() {
+            Arrays.fill(d, INF);
+            Arrays.fill(par, -1);
+            TreeSet<Pair<Long, Integer>> queue = new TreeSet<>(Comparator.comparingLong(Pair::getFirst));
+            d[s] = 0;
+            queue.add(new Pair<>(d[s], s));
             while (!queue.isEmpty()) {
-                int node = queue.poll().getSecond();
-                for (int edgeIndex : graph.get(node)) {
-                    Edge edge = edges.get(edgeIndex);
-                    long weight = edge.cost + potential[node] - potential[edge.destination];
-                    if (edge.capacity - edge.flow > 0 && distance[node] + weight < distance[edge.destination]) {
-                        queue.remove(new Pair<>(distance[edge.destination], edge.destination));
-                        distance[edge.destination] = distance[node] + weight;
-                        parent[edge.destination] = edgeIndex;
-                        queue.add(new Pair<>(distance[edge.destination], edge.destination));
+                int u = queue.pollFirst().getSecond();
+                for (int i : g.get(u)) {
+                    Edge e = edge.get(i);
+                    long w = e.cost + p[u] - p[e.v];
+                    if (e.c - e.f > 0 && d[u] + w < d[e.v]) {
+                        queue.remove(new Pair<>(d[e.v], e.v));
+                        d[e.v] = d[u] + w;
+                        par[e.v] = i;
+                        queue.add(new Pair<>(d[e.v], e.v));
                     }
                 }
             }
-            for (int i = 0; i < numNodes; ++i) {
-                if (distance[i] < INF) {
-                    distance[i] += potential[i] - potential[source];
+            for (int i = 0; i < n; i++) {
+                if (d[i] < INF) {
+                    d[i] += p[i] - p[s];
                 }
             }
-            for (int i = 0; i < numNodes; ++i) {
-                if (distance[i] < INF) {
-                    potential[i] = distance[i];
+            for (int i = 0; i < n; i++) {
+                if (d[i] < INF) {
+                    p[i] = d[i];
                 }
             }
-            return distance[sink] != INF;
+            return d[t] != INF;
         }
 
-        long sendFlow(int node, long flowAmount, long[] totalCost) {
-            if (parent[node] == -1) return flowAmount;
-            int edgeIndex = parent[node];
-            Edge edge = edges.get(edgeIndex);
-            Edge reverseEdge = edges.get(edgeIndex ^ 1);
-            long currentFlow = Math.min(flowAmount, edge.capacity - edge.flow);
-            long bottleneckFlow = sendFlow(edge.destination, currentFlow, totalCost);
-            edge.flow += bottleneckFlow;
-            reverseEdge.flow -= bottleneckFlow;
-            totalCost[0] += bottleneckFlow * edge.cost;
-            return bottleneckFlow;
+        private long sendFlow(int u, long cur, long[] cost) {
+            if (par[u] == -1) return cur;
+            int i = par[u];
+            Edge e = edge.get(i);
+            Edge bck = edge.get(i ^ 1);
+            long f = sendFlow(bck.v, Math.min(cur, e.c - e.f), cost);
+            e.f += f;
+            bck.f -= f;
+            cost[0] += f * e.cost;
+            return f;
         }
 
-        Pair<Long, Long> computeMaxFlow() {
-            long maxFlow = 0, minCost = 0;
-            while (relaxEdges()) {
-                long[] cost = {0};
-                long flow = sendFlow(sink, INF, cost);
-                if (flow == 0) break;
-                maxFlow += flow;
-                minCost += cost[0];
+        Pair<Long, Long> maxFlow() {
+            Arrays.fill(d, INF);
+            Arrays.fill(p, 0);
+            d[s] = 0;
+            boolean relax = true;
+            for (int flex = 0; flex < n && relax; flex++) {
+                relax = false;
+                for (int u = 0; u < n; u++) {
+                    for (int i : g.get(u)) {
+                        Edge e = edge.get(i);
+                        if (d[u] + e.cost < d[e.v]) {
+                            d[e.v] = d[u] + e.cost;
+                            relax = true;
+                        }
+                    }
+                }
             }
-            return new Pair<>(maxFlow, minCost);
+            for (int i = 0; i < n; i++) {
+                if (d[i] < INF) {
+                    p[i] = d[i];
+                }
+            }
+            long flow = 0, cost = 0;
+            while (flex()) flow += sendFlow(t, INF, new long[]{cost});
+            ft = new int[edge.size()];
+            for (int i = 0; i < edge.size(); i++) {
+                ft[i] = (int) edge.get(i).f;
+            }
+            return new Pair<>(flow, cost);
         }
     }
 
-    // Вложенный класс Pair для представления пары значений
-    static class Pair<T1 extends Comparable<T1>, T2 extends Comparable<T2>> implements Comparable<Pair<T1, T2>> {
-        T1 first;
-        T2 second;
+    static class Pair<K, V> {
+        private final K first;
+        private final V second;
 
-        Pair(T1 first, T2 second) {
+        public Pair(K first, V second) {
             this.first = first;
             this.second = second;
         }
 
-        public T1 getFirst() {
+        public K getFirst() {
             return first;
         }
 
-        public T2 getSecond() {
+        public V getSecond() {
             return second;
-        }
-
-        @Override
-        public int compareTo(Pair<T1, T2> other) {
-            int cmp = first.compareTo(other.first);
-            if (cmp == 0) {
-                cmp = second.compareTo(other.second);
-            }
-            return cmp;
         }
     }
 }

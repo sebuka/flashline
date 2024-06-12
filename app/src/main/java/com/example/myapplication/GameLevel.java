@@ -101,12 +101,13 @@ public class GameLevel {
         int[][] model = new int[gridSize][gridSize];
 
         int totalCells = gridSize * gridSize;
-        points = Math.min(random.nextInt(diff.getMaxPoints() - diff.getMinPoints() + 1) + diff.getMinPoints(), totalCells / 2);
-        int remainingCells = totalCells - points;
+        int remainingCells = totalCells;
         int walls = Math.min(random.nextInt(diff.getMaxWalls() - diff.getMinWalls() + 1) + diff.getMinWalls(), remainingCells);
         remainingCells -= walls;
         int bridges = Math.min(random.nextInt(diff.getMaxBridges() - diff.getMinBridges() + 1) + diff.getMinBridges(), remainingCells);
         remainingCells -= bridges;
+        points = random.nextInt(diff.getMaxPoints() - diff.getMinPoints() + 1) + diff.getMinPoints();
+        remainingCells -= points;
         int emptyCells = remainingCells;
 
         List<Integer> cells = new ArrayList<>();
@@ -120,7 +121,7 @@ public class GameLevel {
         for (int i = 0; i < walls; i++) cells.add(-2);
         for (int i = 0; i < bridges; i++) cells.add(-1);
         for (int i = 0; i < emptyCells; i++) cells.add(0);
-
+        cells = cells.subList(0, gridSize * gridSize);
         Collections.shuffle(cells, random);
 
         int index = 0;
@@ -129,16 +130,22 @@ public class GameLevel {
                 model[i][j] = cells.get(index++);
             }
         }
-
+        StringBuilder b = new StringBuilder();
+        for (int[] l : model) {
+            for (int x : l) {
+                b.append(x).append(" ");
+            }
+        }
+        Log.d("Model", String.valueOf(gridSize));
+        Log.d("Model", b.toString());
         return model;
     }
 
     private boolean validateModel(int[][] model) {
         LevelValidator validator = new LevelValidator(model);
-        optimalPaths = validator.validate();
+        optimalPaths = (int) validator.validate() / 2;
         Log.d("Validator", String.valueOf(optimalPaths));
-        return true;
-        //return optimalPaths != -1;
+        return optimalPaths != -1;
     }
 
     private void renderModel(GridLayout gridLayout, int[][] model, int itemSize) {
@@ -147,7 +154,6 @@ public class GameLevel {
         gridLayout.setRowCount(gridSize);
         gridLayout.setColumnCount(gridSize);
         grid = new GameObject[gridSize][gridSize];
-        List<Integer> colors = getShuffledColors(gridLayout.getContext(), seed);
         for (int i = 0; i < gridSize; i++) {
             for (int j = 0; j < gridSize; j++) {
                 ImageView imageView = createImageView(gridLayout, itemSize);
@@ -164,7 +170,7 @@ public class GameLevel {
                         gameObject = new Bridge(i, j, imageView);
                         break;
                     default:
-                        gameObject = new Point(i, j, colors.get(model[i][j]), imageView);
+                        gameObject = new Point(i, j, imageView);
                         break;
                 }
 
@@ -262,7 +268,6 @@ public class GameLevel {
                 } else {
                     if (lastPath.get(lastPath.size() - 1).canConnect(connectable) && connectable.canConnect(lastPath.get(lastPath.size() - 1))) {
                         try {
-                            connectable.setColor(lastPath.get(0).getColor(0), (4 - object.getConnectedPositionType(lastPath.get(lastPath.size() - 1))) % 4);
                             connectable.connect(lastPath.get(lastPath.size() - 1));
                             lastPath.get(lastPath.size() - 1).connect(connectable);
                         } catch (Exception e) {
@@ -363,7 +368,6 @@ public class GameLevel {
         int optimalPathScore = (int) ((optimalPaths / (float) getPathsCount()) * 100);
         int timeScore = (elapsedTime <= difficulty.getOptimalTime()) ? 100 : Math.max(0, 100 - ((elapsedTime - difficulty.getOptimalTime()) * 2));
 
-        // Calculate the weighted score
         return (int) (pathScore * 0.4 + optimalPathScore * 0.4 + timeScore * 0.2);
     }
 
