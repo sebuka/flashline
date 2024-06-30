@@ -1,6 +1,7 @@
 package ru.sebuka.flashline.managers;
 
 import android.content.Context;
+import android.util.Log;
 import android.widget.Toast;
 
 import retrofit2.Call;
@@ -24,6 +25,7 @@ public class ProfileManager {
                     Toast.makeText(context, "Профиль загружен успешно", Toast.LENGTH_SHORT).show();
                     callback.onProfileLoaded(user);
                 } else {
+                    Log.i("Profile",response.message());
                     Toast.makeText(context, "Ошибка загрузки профиля", Toast.LENGTH_SHORT).show();
                     callback.onProfileLoadFailed(new Exception("Ошибка загрузки профиля"));
                 }
@@ -33,6 +35,7 @@ public class ProfileManager {
             public void onFailure(Call<UserResponse> call, Throwable t) {
                 Toast.makeText(context, "Ошибка загрузки профиля", Toast.LENGTH_SHORT).show();
                 callback.onProfileLoadFailed(t);
+                Log.i("Profile",call.toString());
             }
         });
     }
