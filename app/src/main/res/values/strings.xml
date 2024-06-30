@@ -1,6 +1,9 @@
 <resources>
-    <string name="app_name">My Application</string>
+    <string name="app_name">FlashLine</string>
     <string name="game_title">FlashLine</string>
-    <string name="play_button">Играть</string>
+    <string name="play_button_competitive">Соревновательная</string>
+    <string name="play_button_puzzle">Головоломка</string>
     <string name="stats_button">Статистика</string>
+    <string name="client_id">271762518798-0gh5ff83rbak9b2jneohsmo3vrsfte82.apps.googleusercontent.com</string>
+    <string name="server_adress">remarkable-creativity-production.up.railway.app</string>
 </resources>

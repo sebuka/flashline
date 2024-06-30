@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:width="108px" android:height="108px">
+        <shape android:shape="rectangle">
+            <size android:width="108dp" android:height="108dp" />
+        </shape>
+    </item>
+    <item>
+        <inset android:insetLeft="0px" android:insetTop="0px" android:insetRight="0dp" android:insetBottom="0dp">
+            <layer-list>
+                <item android:drawable="@drawable/grid_item_background" />
+                <item android:drawable="@drawable/point" />
+            </layer-list>
+        </inset>
+    </item>
+</layer-list>

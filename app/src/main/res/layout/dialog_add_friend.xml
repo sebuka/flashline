@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="#404050"
+    android:gravity="center_horizontal">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/editTextFriendCode"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:hint="Введите код друга"
+            android:inputType="text"
+            android:padding="8dp"
+            android:background="#505050"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#B0B0B0"/>
+
+        <Button
+            android:id="@+id/buttonAddFriend"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Добавить"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/button_background"
+            android:textColor="#FFFFFF"
+            android:minWidth="100dp"/>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/textViewYourFriendCode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Ваш код друга:"
+        android:textSize="18sp"
+        android:textColor="#FFFFFF"
+        android:layout_gravity="center_horizontal"/>
+
+    <TextView
+        android:id="@+id/textViewFriendCode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="код друга"
+        android:textSize="18sp"
+        android:textColor="#FFFFFF"
+        android:background="#30313F"
+        android:padding="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_gravity="center_horizontal"/>
+
+    <TextView
+        android:id="@+id/click_to_copy_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="(нажмите чтобы скопировать)"
+        android:textAlignment="center"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp"
+        android:layout_marginTop="16dp"
+        android:layout_gravity="center_horizontal"/>
+</LinearLayout>
