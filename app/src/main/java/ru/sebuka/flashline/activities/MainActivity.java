@@ -30,6 +30,7 @@ import okhttp3.Response;
 import okhttp3.MediaType;
 import okhttp3.Callback;
 import ru.sebuka.flashline.R;
+import ru.sebuka.flashline.utils.LevelValidator;
 
 import java.io.IOException;
 
@@ -58,8 +59,19 @@ public class MainActivity extends AppCompatActivity {
         } else {
             authenticateWithServer();
         }
+        test();
     }
-
+    public static void test(){
+        int n = 4;
+        int m = 5;
+        LevelValidator.MCMF mcmf = new LevelValidator.MCMF(n,0,n - 1);
+        mcmf.addEdge(0 , 1, 1,2);
+        mcmf.addEdge(0 , 2, 2,2);
+        mcmf.addEdge(2 , 1, 1,1);
+        mcmf.addEdge(1 , 3, 2,1);
+        mcmf.addEdge(2 , 3, 2,3);
+        Log.i("TEST MCMF", String.valueOf(mcmf.maxFlow().getFirst()));
+    }
     private void signIn() {
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);

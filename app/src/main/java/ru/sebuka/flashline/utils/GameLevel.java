@@ -240,14 +240,24 @@ public class GameLevel {
 
 
     public int calculateScore() {
-        int pathScore = (int) ((completedPaths / (float) model.getOptimalPaths()) * 100);
-        int optimalPathScore = (int) ((optimalPaths / (float) getPathsCount()) * 100);
-        int timeScore = (elapsedTime <= model.getTime()) ? 100 : Math.max(0, 100 - ((elapsedTime - model.getTime()) * 2));
+        int optimalPaths = model.getOptimalPaths() + 5;
+        optimalPaths *= model.getPathsPersantage();
+        int pathsCount = getPathsCount();
+        int timeLimit = model.getTime() / 10;
 
-        return (int) (pathScore * 0.4 + optimalPathScore * 0.4 + timeScore * 0.2);
+
+        float pathRatio = (optimalPaths > 0 && model.getPoints() > 0) ? (completedPaths / (float) model.getPoints()) * 100 : 0;
+        float optimalPathRatio = (pathsCount > 0) ? (optimalPaths / (float) pathsCount) * 100 : 0;
+        float timeRatio = elapsedTime > 0 ? (timeLimit / (float) elapsedTime) * 100 : 0;
+
+
+        float pathScore = pathRatio;
+        float optimalPathScore = (pathsCount >= optimalPaths) ? (100 - optimalPathRatio) : 0;
+        float timeScore = elapsedTime < timeLimit ? (100 + timeRatio) : Math.min(100, timeRatio);
+
+
+        return (int) (pathScore * 0.4 + optimalPathScore * 0.3 + timeScore * 0.3);
     }
-
-
     public int getSeed() {
         return model.getSeed();
     }

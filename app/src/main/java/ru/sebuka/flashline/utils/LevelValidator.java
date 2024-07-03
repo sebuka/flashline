@@ -1,14 +1,17 @@
 package ru.sebuka.flashline.utils;
 
+import android.util.Log;
+
 import java.util.*;
 
 import ru.sebuka.flashline.models.LevelModel;
 
-class LevelValidator {
+public class LevelValidator {
     private static final long INF = Long.MAX_VALUE / 2;
     private int n, s, t;
     private int[][] grid;
     private MCMF mcmf;
+    private int cnt = 0;
 
     public LevelValidator(LevelModel model) {
         n = model.getSize();
@@ -24,21 +27,21 @@ class LevelValidator {
     }
 
     public long validate() {
-        Map<Integer, Boolean> colors = new HashMap<>();
+        int sz = 0;
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
                 int type = grid[i][j];
                 if (type > 0) {
-                    if (!colors.containsKey(type)) {
-                        mcmf.addEdge(s, j * n + i + 1, 1, 0);
+                    if (sz % 2 == 0) {
+                        mcmf.addEdge(s, i * n + j + 1, 1, 0);
                     } else {
-                        mcmf.addEdge(j * n + i + 1 + n * n, t, 1, 0);
+                        mcmf.addEdge(i * n + j + 1 + n * n, t, 1, 0);
                     }
-                    colors.put(type, true);
+                    sz++;
                 }
             }
         }
-
+        cnt = sz;
         int[][] h = new int[n][n];
         int[][] v = new int[n][n];
         for (int i = 0; i < n; i++) {
@@ -54,7 +57,8 @@ class LevelValidator {
                     v[i][j] = i * n + j + 1 + 2 * n * n;
                     mcmf.addEdge(v[i][j], v[i][j] + n * n, 1, 0);
                 } else if (grid[i][j] != -2) {
-                    h[i][j] = v[i][j] = i * n + j + 1;
+                    h[i][j] = i * n + j + 1;
+                    v[i][j] = i * n + j + 1;
                     mcmf.addEdge(h[i][j], h[i][j] + n * n, 1, 0);
                 }
             }
@@ -80,17 +84,17 @@ class LevelValidator {
             }
         }
 
-        int need = colors.size();
         Pair<Long, Long> result = mcmf.maxFlow();
-        if (result.getFirst() != need) {
+        cnt/= 2;
+        if (result.getFirst().compareTo(Long.valueOf(cnt)) != 0) {
             return -1;
         } else {
-            return result.getSecond() / 2;
+            return result.getSecond();
         }
     }
 
 
-    static class MCMF {
+    public static class MCMF {
         class Edge {
             int v;
             long c, f, cost;
@@ -105,40 +109,42 @@ class LevelValidator {
 
         private int n, s, t;
         private List<Edge> edge;
-        private List<List<Integer>> g;
+        private List<Integer>[] g;
         private long[] d, p;
-        private int[] par, ft;
+        private int[] par;
 
-        MCMF(int n, int s, int t) {
+        private long cost = 0;
+
+        public MCMF(int n, int s, int t) {
             this.n = n;
             this.s = s;
             this.t = t;
             edge = new ArrayList<>();
-            g = new ArrayList<>(n);
+            g = new List[n];
             for (int i = 0; i < n; i++) {
-                g.add(new ArrayList<>());
+                g[i] = new ArrayList<>();
             }
             d = new long[n];
             p = new long[n];
             par = new int[n];
         }
 
-        void addEdge(int u, int v, long c, long cost) {
-            g.get(u).add(edge.size());
+        public void addEdge(int u, int v, long c, long cost) {
+            g[u].add(edge.size());
             edge.add(new Edge(v, c, 0, cost));
-            g.get(v).add(edge.size());
+            g[v].add(edge.size());
             edge.add(new Edge(u, 0, 0, -cost));
         }
 
         private boolean flex() {
             Arrays.fill(d, INF);
             Arrays.fill(par, -1);
-            TreeSet<Pair<Long, Integer>> queue = new TreeSet<>(Comparator.comparingLong(Pair::getFirst));
+            TreeSet<Pair<Long, Integer>> queue = new TreeSet<>();
             d[s] = 0;
             queue.add(new Pair<>(d[s], s));
             while (!queue.isEmpty()) {
                 int u = queue.pollFirst().getSecond();
-                for (int i : g.get(u)) {
+                for (int i : g[u]) {
                     Edge e = edge.get(i);
                     long w = e.cost + p[u] - p[e.v];
                     if (e.c - e.f > 0 && d[u] + w < d[e.v]) {
@@ -162,19 +168,19 @@ class LevelValidator {
             return d[t] != INF;
         }
 
-        private long sendFlow(int u, long cur, long[] cost) {
+        private long sendFlow(int u, long cur) {
             if (par[u] == -1) return cur;
             int i = par[u];
             Edge e = edge.get(i);
             Edge bck = edge.get(i ^ 1);
-            long f = sendFlow(bck.v, Math.min(cur, e.c - e.f), cost);
+            long f = sendFlow(bck.v, Math.min(cur, e.c - e.f));
             e.f += f;
             bck.f -= f;
-            cost[0] += f * e.cost;
+            cost += f * e.cost;
             return f;
         }
 
-        Pair<Long, Long> maxFlow() {
+        public Pair<Long, Long> maxFlow() {
             Arrays.fill(d, INF);
             Arrays.fill(p, 0);
             d[s] = 0;
@@ -182,7 +188,7 @@ class LevelValidator {
             for (int flex = 0; flex < n && relax; flex++) {
                 relax = false;
                 for (int u = 0; u < n; u++) {
-                    for (int i : g.get(u)) {
+                    for (int i : g[u]) {
                         Edge e = edge.get(i);
                         if (d[u] + e.cost < d[e.v]) {
                             d[e.v] = d[u] + e.cost;
@@ -196,17 +202,15 @@ class LevelValidator {
                     p[i] = d[i];
                 }
             }
-            long flow = 0, cost = 0;
-            while (flex()) flow += sendFlow(t, INF, new long[]{cost});
-            ft = new int[edge.size()];
-            for (int i = 0; i < edge.size(); i++) {
-                ft[i] = (int) edge.get(i).f;
-            }
+            long flow = 0;
+            cost = 0;
+            while (flex()) flow += sendFlow(t, INF);
             return new Pair<>(flow, cost);
         }
     }
 
-    static class Pair<K, V> {
+    //34812432
+    public static class Pair<K extends Comparable<K>, V extends Comparable<V>> implements Comparable<Pair<K, V>> {
         private final K first;
         private final V second;
 
@@ -222,5 +226,15 @@ class LevelValidator {
         public V getSecond() {
             return second;
         }
+
+        @Override
+        public int compareTo(Pair<K, V> o) {
+            int cmp = first.compareTo(o.first);
+            if (cmp != 0) {
+                return cmp;
+            }
+            return second.compareTo(o.second);
+        }
     }
+
 }

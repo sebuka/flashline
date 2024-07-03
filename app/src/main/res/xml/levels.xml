@@ -20,13 +20,19 @@
         <row>-2, -2, 0, -2, 0</row>
         <row>4, 0, 0, -1, 5</row>
     </level>
-    <level number="4" size="5" time="60" pathsPercentage="0.8" seed="-1" points="2" optimalPaths="21">
-        <row>1, -2, 0, 0, 2</row>
-        <row>0, 0, 0, -2, -2</row>
-        <row>0, -1, -1, 0, 0</row>
-        <row>-2, -2, 0, -2, 0</row>
-        <row>4, 0, 0, -2, 5</row>
+    <level number="4" size="10" time="120" pathsPercentage="0.9" seed="-1" points="5" optimalPaths="1">
+        <row>1, 0, 0, -2, 1, 0, 0, 1, -2, 0</row>
+        <row>0, 0, 0, -1, 0, -2, 0, 0, 0, 0</row>
+        <row>0, 0, 0, -2, 0, -2, 0, 0, 0, 0</row>
+        <row>0, 0, -2, 0, 0, 0, 0, -2, 0, 1</row>
+        <row>-2, 0, 1, 0, 0, 0, -2, 0, 0, 0</row>
+        <row>0, 0, -2, -1, 0, -1, 2, 0, 0, 0</row>
+        <row>0, -2, 1, 0, 0, 0, -2, 0, 1, 0</row>
+        <row>0, 0, -2, 0, 0, 0, -2, 0, 0, 0</row>
+        <row>1, -2, 0, 0, 0, 0, -2, 0, 0, 0</row>
+        <row>-1, 0, 0, 0, 0, 2, -2, 0, 0, 0</row>
     </level>
+
     <level number="5" size="5" time="60" pathsPercentage="0.8" seed="-1" points="2" optimalPaths="21">
         <row>1, -2, 0, 0, 2</row>
         <row>0, 0, 0, -2, -2</row>
@@ -57,29 +63,29 @@
     </level>
     <level number="9" size="5" time="60" pathsPercentage="0.8" seed="-1" points="2" optimalPaths="21">
         <row>1, -2, 0, 0, 2</row>
-        <row>0, -2, 0, -2, -2</row>
+        <row>0, -2, -1, -2, 0</row>
         <row>0, 0, -1, 0, 0</row>
-        <row>-2, -2, 0, -2, 0</row>
-        <row>4, 0, 0, -2, 5</row>
+        <row>0, -2, 0, -2, 0</row>
+        <row>4, 0, -1, -2, 5</row>
     </level>
     <level number="10" size="5" time="60" pathsPercentage="0.8" seed="-1" points="2" optimalPaths="21">
         <row>1, -2, 0, 0, 2</row>
-        <row>0, -2, 0, -2, -2</row>
-        <row>0, 0, -1, 0, 0</row>
-        <row>-2, -2, 0, -2, 0</row>
+        <row>0, -0, 0, -2, 0</row>
+        <row>0, -1, -1, 0, 0</row>
+        <row>-2, -0, 0, -2, 0</row>
         <row>4, 0, 0, -2, 5</row>
     </level>
     <level number="11" size="5" time="60" pathsPercentage="0.8" seed="-1" points="2" optimalPaths="21">
-        <row>1, -2, 0, 0, 2</row>
+        <row>1, 0, -1, 0, 2</row>
         <row>0, -2, 0, -2, -2</row>
-        <row>0, 0, -1, 0, 0</row>
+        <row>0, 0, 0, 0, 0</row>
         <row>-2, -2, 0, -2, 0</row>
         <row>4, 0, 0, -2, 5</row>
     </level>
     <level number="12" size="5" time="60" pathsPercentage="0.8" seed="-1" points="2" optimalPaths="21">
-        <row>1, -2, 0, 0, 2</row>
-        <row>0, -2, 0, -2, -2</row>
-        <row>0, 0, -1, 0, 0</row>
+        <row>1, -2,-1, 0, 2</row>
+        <row>0, -2, 0, 0, -2</row>
+        <row>0, -1, -1, -1,0</row>
         <row>-2, -2, 0, -2, 0</row>
         <row>4, 0, 0, -2, 5</row>
     </level>

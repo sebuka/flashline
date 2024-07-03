@@ -37,12 +37,13 @@ public class LevelModelGenerator {
 
         int totalCells = gridSize * gridSize;
         int remainingCells = totalCells;
+        int points = random.nextInt(diff.getMaxPoints() - diff.getMinPoints() + 1) + diff.getMinPoints();
+        remainingCells -= points;
         int walls = Math.min(random.nextInt(diff.getMaxWalls() - diff.getMinWalls() + 1) + diff.getMinWalls(), remainingCells);
         remainingCells -= walls;
         int bridges = Math.min(random.nextInt(diff.getMaxBridges() - diff.getMinBridges() + 1) + diff.getMinBridges(), remainingCells);
         remainingCells -= bridges;
-        int points = random.nextInt(diff.getMaxPoints() - diff.getMinPoints() + 1) + diff.getMinPoints();
-        remainingCells -= points;
+
         int emptyCells = remainingCells;
 
         List<Integer> cells = new ArrayList<>();
@@ -56,6 +57,14 @@ public class LevelModelGenerator {
         for (int i = 0; i < walls; i++) cells.add(-2);
         for (int i = 0; i < bridges; i++) cells.add(-1);
         for (int i = 0; i < emptyCells; i++) cells.add(0);
+        int desiredSize = gridSize * gridSize;
+        if (cells.size() > desiredSize) {
+            cells = new ArrayList<>(cells.subList(0, desiredSize));
+        } else {
+            while (cells.size() < desiredSize) {
+                cells.add(0);
+            }
+        }
         Collections.shuffle(cells, random);
 
         int index = 0;
@@ -71,8 +80,7 @@ public class LevelModelGenerator {
                 b.append(x).append(" ");
             }
         }
-        Log.d("Model", String.valueOf(gridSize));
-        Log.d("Model", b.toString());
+        Log.d("Model",String.valueOf(gridSize)+"\n"+ b.toString());
 
         model.setPoints(points);
         model.setTime(diff.getOptimalTime());
@@ -83,7 +91,7 @@ public class LevelModelGenerator {
 
     private int validateModel(LevelModel model) {
         LevelValidator validator = new LevelValidator(model);
-        int optimalPaths = (int) validator.validate() / 2;
-        return optimalPaths ;
+        long optimalPaths = validator.validate();
+        return (int) optimalPaths ;
     }
 }

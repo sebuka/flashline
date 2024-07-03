@@ -35,6 +35,7 @@ public class LevelActivity extends AppCompatActivity {
     private TextView timeText;
     private ImageButton settingsButton;
     private GridLayout gridLayout;
+    private boolean isActivityActive;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +66,7 @@ public class LevelActivity extends AppCompatActivity {
             SettingsDialogFragment settingsDialog = new SettingsDialogFragment(gameLevel.getSeed());
             settingsDialog.show(getSupportFragmentManager(), "settings_dialog");
         });
+        isActivityActive = true;
     }
 
     @Override
@@ -129,37 +131,45 @@ public class LevelActivity extends AppCompatActivity {
     }
 
     private void showResultsDialog() {
-        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_results, null);
+        if (!isActivityActive) return;
 
-        TextView resultText = dialogView.findViewById(R.id.result_text);
-        ImageView star1 = dialogView.findViewById(R.id.star_1);
-        ImageView star2 = dialogView.findViewById(R.id.star_2);
-        ImageView star3 = dialogView.findViewById(R.id.star_3);
-        TextView scoreText = dialogView.findViewById(R.id.score_text);
-        Button toMain = dialogView.findViewById(R.id.btn_main_menu);
-        if (gameLevel.getCompletedPaths() >= gameLevel.getModel().getPoints()) {
-            star1.setColorFilter(ContextCompat.getColor(this, R.color.star_color), android.graphics.PorterDuff.Mode.SRC_IN);
-            if (gameLevel.getElapsedTime() <= gameLevel.getModel().getOptimalPaths()) {
-                star2.setColorFilter(ContextCompat.getColor(this, R.color.star_color), android.graphics.PorterDuff.Mode.SRC_IN);
-                if (gameLevel.getPathsCount() >= gameLevel.getModel().getOptimalPaths() * gameLevel.getModel().getPathsPersantage()) {
-                    star3.setColorFilter(ContextCompat.getColor(this, R.color.star_color), android.graphics.PorterDuff.Mode.SRC_IN);
+        runOnUiThread(() -> {
+            View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_results, null);
+
+            TextView resultText = dialogView.findViewById(R.id.result_text);
+            ImageView star1 = dialogView.findViewById(R.id.star_1);
+            ImageView star2 = dialogView.findViewById(R.id.star_2);
+            ImageView star3 = dialogView.findViewById(R.id.star_3);
+            TextView scoreText = dialogView.findViewById(R.id.score_text);
+            Button toMain = dialogView.findViewById(R.id.btn_main_menu);
+
+            if (gameLevel.getCompletedPaths() >= gameLevel.getModel().getPoints()) {
+                star1.setColorFilter(ContextCompat.getColor(this, R.color.star_color), android.graphics.PorterDuff.Mode.SRC_IN);
+                if (gameLevel.getElapsedTime() <= gameLevel.getModel().getTime()) {
+                    star2.setColorFilter(ContextCompat.getColor(this, R.color.star_color), android.graphics.PorterDuff.Mode.SRC_IN);
+                    if ((float) gameLevel.getPathsCount() * gameLevel.getModel().getPathsPersantage() <= gameLevel.getModel().getOptimalPaths()) {
+                        star3.setColorFilter(ContextCompat.getColor(this, R.color.star_color), android.graphics.PorterDuff.Mode.SRC_IN);
+                    }
                 }
             }
-        }
-        resultText.setText("Результат");
-        int score = gameLevel.calculateScore();
-        scoreText.setText("Счет: " + score);
-        toMain.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+
+            resultText.setText("Результат");
+            int score = gameLevel.calculateScore();
+            scoreText.setText("Счет: " + score);
+
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setView(dialogView);
+            builder.setCancelable(false);
+            AlertDialog dialog = builder.create();
+            toMain.setOnClickListener(v -> {
+                dialog.hide();
                 finish();
+            });
+
+            if (isActivityActive) {
+                dialog.show();
             }
         });
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setView(dialogView);
-
-        builder.setCancelable(false);
-        builder.show();
     }
 }
